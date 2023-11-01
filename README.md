@@ -1,1 +1,1 @@
-# lm - some notes on work in progress
+# lm - work in progress
