@@ -113,9 +113,12 @@ def analyze(lang):
     plt.savefig('%s-freqTop20bigrams.png' % langFilePrefix[lang])
     plt.show()
 
+    ipaBigrams = [x for x in ipaBigrams if x[1] != 0]
     y = [i[1] for i in ipaBigrams]
     x = range(len(y))
     plt.plot(x,y)
+    #plt.xscale('log')
+    plt.yscale('log')
     plt.title('frequency of bigrams of all %d bigrams, in decreasing order' % len(ipaBigrams))
     plt.savefig('%s-freq%dbigrams.png' % (langFilePrefix[lang],len(ipaBigrams)))
     plt.show()
