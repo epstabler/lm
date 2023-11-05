@@ -1,16 +1,40 @@
 # 1 Supplemental: Building some IPA corpora
 
+To create IPA corpora for one of the languages
+
+```
+   cmn eng fra hin pol rus spa tha
+```
+
+use
+
+```
+python BUILD-CORPORA <language>
+```
+
+after installing nltk corpora, UD corpora, piconll, and epitran,
+as described below.
+
+For each corpus *, several formats are saved:
+
+* `*-words.txt` has 1 sentence per line, removing punctuation except possessive 's
+
+* `*-ipa.txt` has ipa transcriptions of the same lines
+
+* `*-ipaSpaced.txt` puts spaces between the ipa characters
+
+
 ## 1.1. Jane Austen's *Emma*
 
 The [Gutenberg version of Emma](https://www.gutenberg.org/ebooks/158)
 is available as part of the [NLTK](https://www.nltk.org/) 
 [corpora](https://www.nltk.org/howto/corpus.html).
 
-NLTK also parses the novel into sentences for us.
+NLTK also parses Emma into sentences for us.
 
 ```
-> pip install nltk
-> python -m nltk.downloader gutenberg
+pip install nltk
+python -m nltk.downloader gutenberg
 ```
 
 ## 1.2 UD corpora
@@ -21,9 +45,9 @@ available [here](https://lindat.mff.cuni.cz/repository/xmlui/handle/11234/1-5150
 Unpack ud-treebanks-v2.12.tgz in this directory:
 
 ```
-> wget https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-5150/ud-treebanks-v2.12.tgz
-> tar xvzf ud-treebanks-v2.12.tgz
-> rm ud-treebanks-v2.12.tgz
+wget https://lindat.mff.cuni.cz/repository/xmlui/bitstream/handle/11234/1-5150/ud-treebanks-v2.12.tgz
+tar xvzf ud-treebanks-v2.12.tgz
+rm ud-treebanks-v2.12.tgz
 ```
 
 Probably, more recent versions of the UD treebanks will work just as well.
@@ -31,28 +55,8 @@ Probably, more recent versions of the UD treebanks will work just as well.
 We use the python package piconll to access the treebank files.
 
 ```
-> pip install piconll
+pip install piconll
 ```
-
-Files in this directory show how corpora were prepared in these languages,
-all of which are also handled by Epitran (described just below).
-
-* cmn Mandarin
-* eng English
-* fra French
-* hin Hindi
-* pol Polish
-* rus Russian
-* spa Spanish
-* tha Thai
-
-For each corpus *, several formats are saved:
-
-* `*-words.txt` has 1 sentence per line, removing punctuation except possessive 's
-
-* `*-ipa.txt` has ipa transcriptions of the same lines
-
-* `*-ipaSpaced.txt` puts spaces between the ipa characters
 
 ## 1.3 IPA transcription
 [Epitran](https://github.com/dmort27/epitran), presented by
