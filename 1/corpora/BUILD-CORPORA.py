@@ -105,10 +105,9 @@ def adjustTxt(lang, txt):
 
     elif lang == 'eng' or lang == 'emma':
         txt = re.sub(" ' s ", "'s ", txt)   # keep possessive 's attached, for emma
-        txt = re.sub('Dr\.', 'Doctor', txt) # epitran does not understand "Dr.", for emma
-        txt = re.sub('&c', 'etcetera', txt) # epitran does not understand "&c", for emma
         # fix some (rare) things that might appear in examples
         txt = re.sub('Dr\.', 'Doctor', txt)
+        txt = re.sub('&c', 'etcetera', txt) # epitran does not understand "&c", for emma
         txt = re.sub('Mr\.', 'Mister', txt)
         txt = re.sub('Mrs\.', 'Missus', txt)
         txt = re.sub('Ms\.', 'Miz', txt)
