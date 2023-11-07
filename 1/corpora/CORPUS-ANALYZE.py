@@ -2,16 +2,19 @@ import sys, re
 import matplotlib.pylab as plt
 
 USAGE = """
-This code reads a specified ipa corpus s
-and reports some simple statistics,
-writing them to ./s-stats.txt
+   python CORPUS-ANALYZE.py x
 
-Use:
+where x is one of the language file prefixes
+listed just below, reports some simple statistics
+on the corpus x-y named by x, and writes those
+statistics to x-y-stats.txt
 
-   python CORPUS-ANALYZE.py <CORPUS>
+For example,
 
-where CORPUS is one of the language file prefixes
-listed just below.
+   python CORPUS-ANALYZE.py eng
+
+reads eng-ewt-ipa.txt and
+writes stats to eng-ewt-stats.txt
 """
 
 langFilePrefix = {}
