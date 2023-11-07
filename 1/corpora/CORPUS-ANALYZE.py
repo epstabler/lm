@@ -2,19 +2,16 @@ import sys, re
 import matplotlib.pylab as plt
 
 USAGE = """
-This code reads specified files from the ud-treebanks,
-translates them to ipa, and writes out the results in various formats.
+This code reads a specified ipa corpus s
+and reports some simple statistics,
+writing them to ./s-stats.txt
 
 Use:
 
-   python CORPUS-ANALYZE.py <LANGUAGE>
+   python CORPUS-ANALYZE.py <CORPUS>
 
-where LANGUAGE is one of these:
-
- cmn eng emma fra hin pol rus spa tha
-
-(those are: Mandarin, English, JaneAustensEnglishNovelEmma, French, Hindi, Polish, Russian, Spanish, Thai)
-
+where CORPUS is one of the language file prefixes
+listed just below.
 """
 
 langFilePrefix = {}
@@ -28,9 +25,6 @@ langFilePrefix['rus'] = 'rus-syntagrus'
 langFilePrefix['spa'] = 'spa-ancora'
 langFilePrefix['tha'] = 'tha-pud'
 
-def underscoreSpace(x):
-    return re.sub(' ','_',x)
-
 def syllabic(c):
     return c in ['a','æ','ã','â','à','ä','ā','å','ą','ậ',
                  'e','ẽ','è','ë','ễ','з',
@@ -41,18 +35,20 @@ def syllabic(c):
                  'ə'
                  ]
 
-diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' ̤', ' ̯', '、']
+diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' ̤', ' ̯', '、', '̄']
 
 # some diacritics mark tones too, but these are sometimes not next to vowel,
 #   so we treat them as distinct symbols
 tones = ['「', '」', '『', '』']
 
-def analyze(lang):
-    with open('%s-words.txt' % langFilePrefix[lang], 'r') as file:
-        langwords = file.read().replace('\n', ' ')
+def underscoreSpace(x):
+    return re.sub(' ','_',x)
 
+def analyze(lang):
     with open('%s-ipa.txt' % langFilePrefix[lang], 'r') as file:
         langipa = file.read().replace('\n', ' ')
+
+    w = open('%s-stats.txt' % langFilePrefix[lang], 'w')
 
     ipaSymbols = {}
     for i,x in enumerate(langipa):
@@ -66,11 +62,10 @@ def analyze(lang):
     ipaSymbolsCounts = list(ipaSymbols.items())
     ipaSymbolsCounts.sort(key = lambda x:(-x[1],x[0]))
     
-    print('\nipa vocabulary size =',len(ipaSymbolsCounts))
-    print('\nipa vocabulary (from most to least frequent =\n')
-    for pair in ipaSymbolsCounts:
-        (x, cnt) = pair
-        print('  %s  %d' % (underscoreSpace(x), cnt))
+    for o in [w,sys.stdout]:
+        o.write('ipa corpus size: %d characters\n' % len([x for x in langipa if x != ' ']))
+        o.write('ipa vocabulary size = %d\n' % len(ipaSymbolsCounts))
+        o.write('ipa vocabulary (most frequent first) = %s\n' % str(ipaSymbolsCounts))
     
     ipaBigrams = {}
     for x in ipaSymbolsCounts:
@@ -91,18 +86,25 @@ def analyze(lang):
     ipaBigrams = list(ipaBigrams.items())
     ipaBigrams.sort(key=lambda e:(-e[1],e[0])) # sort by most frequent first
     
-    print('\n# of bigrams =',len(ipaBigrams))
-    print('\n# of zeros =',len([x for x in ipaBigrams if x[1] == 0]))
-    print('\nmost common bigrams:')
-    for i in ipaBigrams[:20]:
-        (x,y) = i[0]
-        a = underscoreSpace(x)
-        b = underscoreSpace(y)
-        cnt = i[1]
-        print('    %s %s    %d' % (a,b,cnt) )
+    n = 10
+    for o in [w,sys.stdout]:
+        o.write('# of bigrams = %d\n' % len(ipaBigrams))
+        o.write('# of zeros = %d\n' % len([x for x in ipaBigrams if x[1] == 0]))
+        o.write('%d most common bigrams: %s\n' % (n, str(ipaBigrams[:n])))
     
-    # a couple of graphs to show frequency distribution
+    syll,nonsyll = (0,0)
+    for c in langipa:
+        if syllabic(c):
+            syll += 1
+        elif not(c in [' ','\n','\t']) and not(c in diacritics) and not(c in tones):
+            nonsyll += 1
+    for o in [w,sys.stdout]:
+        o.write('%d syll, %d non-syll, so %.2f%% syll\n' % (syll, nonsyll, (100.*(syll/(syll+nonsyll)))))
 
+    w.close()
+    sys.exit(0) # comment this line if you want to draw the graphs
+
+    # a couple of graphs to show frequency distribution
     ipaBigrams0 = ipaBigrams[:20]
     y = [i[1] for i in ipaBigrams0]
     x = range(len(y))
@@ -122,15 +124,6 @@ def analyze(lang):
     plt.title('frequency of bigrams of all %d bigrams, in decreasing order' % len(ipaBigrams))
     plt.savefig('%s-freq%dbigrams.png' % (langFilePrefix[lang],len(ipaBigrams)))
     plt.show()
-
-    print('\nipa:')
-    syll,nonsyll = (0,0)
-    for c in langipa:
-        if syllabic(c):
-            syll += 1
-        elif c != ' ' and not(c in diacritics) and not(c in tones):
-            nonsyll += 1
-    print('%d syll, %d non-syll, so %.2f%% syll' % (syll, nonsyll, (100.*(syll/(syll+nonsyll)))))
 
 if __name__ == '__main__':
     if not len(sys.argv) == 2:
