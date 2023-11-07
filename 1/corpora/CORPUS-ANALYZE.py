@@ -15,6 +15,10 @@ For example,
 
 reads eng-ewt-ipa.txt and
 writes stats to eng-ewt-stats.txt
+
+Note that some platforms/editors provide strange
+print/screen representations for some of these
+characters.
 """
 
 langFilePrefix = {}
@@ -29,20 +33,37 @@ langFilePrefix['spa'] = 'spa-ancora'
 langFilePrefix['tha'] = 'tha-pud'
 
 def syllabic(c):
-    return c in ['a','æ','ã','â','à','ä','ā','å','ą','ậ',
-                 'e','ẽ','è','ë','ễ','з',
-                 'i','ĩ','î','ï','ĭ',
-                 'o','õ','़','ॅ','ɔ','ò','ô','ö','œ','ø',
-                 'u','û','ù','ü','ū',
-                 'ɤ',
-                 'ə'
+    return c in ['a','æ','ã','â','à','ä','ā','å','ą','ậ','á','ɑ','ả', 'ạ', 'ă',
+                 'e','ẽ','è','ë','ễ','з','é', 'ɛ', 'ε', 'е', 'ё', '³',
+                 'i','ĩ','î','ï','ĭ','ɪ','ı','ī','í','ɨ',
+                 'o','õ','़','ॅ','ɔ','ò','ô','ö','œ','ø', 
+                 'u','û','ù','ü','ū','ʊ','ʌ','ш', 'ũ', 
+                 'ɤ', 'ə'
                  ]
 
-diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' ̤', ' ̯', '、', '̄']
+# diacritics
+diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' ̤', ' ̯', '、', '̄',
+              '‧', '°', ':', '·', '-', '`', '°', '‧', '^', '|', 'т', '̨', '̧', '̆', '̃', '̥',
+              '̤', 'ʲ', '̇', '̀',
+              ]
 
 # some diacritics mark tones too, but these are sometimes not next to vowel,
 #   so we treat them as distinct symbols
 tones = ['「', '」', '『', '』']
+
+# these are output by epitran, but should not count as phonemes
+junk = ['~', '・', '─', ',', '.', 
+        '曧', '袥', '/', '卧', '坮', '撘', '彝', '鱂', '痹', '\u200b', '$',
+        '脱', '鍝', '洒', '櫾',
+        'N', 'W', 'C', 'Z', 'X', 'K', 'ō', 'Y', 'S',
+        'D', 'G', 'H', 'J', 'R', 'L', 'O', 'E', 'M', 'F', 'U', 'V', 'I'
+        '宿', '芦', '慎', '호', '大', '楽', '園', 'ن', 'د', '伎', '火', 'ǩ', 'ك',
+        'п', 'ч', '箭', 'ʿ', '上', '성', 'л', '則', '部', 'ا', 
+        '胡', '²', '̀', '征', 'ج', '介', '义', '乙', '̉', '粉', '田', '±', '中', '†',
+        '济', '̈', 'م', '安', '藩', '̛', '号', 'њ', 'ش', '̂', '′', '长', '—', 'ر',
+        '강', '四', '玄', '临', 'о', '́', '規', 'ъ', '町', '−', 'д', 'џ', 'ل', 'º', 
+        '井', 'љ', '宮', '宿', 'ذ', '\u200d', 'ऑ', '<', '>', '͡',
+        ]
 
 def underscoreSpace(x):
     return re.sub(' ','_',x)
@@ -59,7 +80,7 @@ def analyze(lang):
             x = x+langipa[i+1]
         if x in ipaSymbols.keys():
             ipaSymbols[x] += 1
-        elif not(x in diacritics):
+        elif not(x in diacritics) and not(x in junk) and not(x in tones):
             ipaSymbols[x] = 1
     
     ipaSymbolsCounts = list(ipaSymbols.items())
@@ -70,6 +91,31 @@ def analyze(lang):
         o.write('ipa vocabulary size = %d\n' % len(ipaSymbolsCounts))
         o.write('ipa vocabulary (most frequent first) = %s\n' % str(ipaSymbolsCounts))
     
+    syll,nonsyll = (0,0)
+    syllInThisFile = set([])
+    nonsyllInThisFile = set([])
+    junkInThisFile = set([])
+    for c in langipa:
+        if c in junk:
+            junkInThisFile.add(c)
+
+        if syllabic(c):
+            syllInThisFile.add(c)
+            syll += 1
+
+        elif not(c in [' ','\n','\t']) and \
+             not(c in diacritics) and \
+             not(c in tones) and \
+             not(c in junk):
+            nonsyllInThisFile.add(c)
+            nonsyll += 1
+
+    for o in [w,sys.stdout]:
+        o.write('ipa syll = %s\n' % str(syllInThisFile))
+        o.write('ipa non-syll = %s\n' % str(nonsyllInThisFile))
+        o.write('junk = %s\n' % str(junkInThisFile))
+        o.write('occurrences: %d syll, %d non-syll, so %.2f%% syll\n' % (syll, nonsyll, (100.*(syll/(syll+nonsyll)))))
+
     ipaBigrams = {}
     for x in ipaSymbolsCounts:
         for y in ipaSymbolsCounts:
@@ -81,7 +127,7 @@ def analyze(lang):
             x = x+langipa[i+1]
         if x in ipaBigrams.keys():
             ipaBigrams[(prev,x)] += 1
-        elif not(x in diacritics):
+        elif not(x in diacritics) and not(x in junk) and not(x in tones):
             ipaBigrams[(prev,x)] += 1
             prev = x 
     ipaBigrams[(prev,' ')] += 1 # count bigram of last character
@@ -95,15 +141,6 @@ def analyze(lang):
         o.write('# of zeros = %d\n' % len([x for x in ipaBigrams if x[1] == 0]))
         o.write('%d most common bigrams: %s\n' % (n, str(ipaBigrams[:n])))
     
-    syll,nonsyll = (0,0)
-    for c in langipa:
-        if syllabic(c):
-            syll += 1
-        elif not(c in [' ','\n','\t']) and not(c in diacritics) and not(c in tones):
-            nonsyll += 1
-    for o in [w,sys.stdout]:
-        o.write('%d syll, %d non-syll, so %.2f%% syll\n' % (syll, nonsyll, (100.*(syll/(syll+nonsyll)))))
-
     w.close()
     sys.exit(0) # comment this line if you want to draw the graphs
 

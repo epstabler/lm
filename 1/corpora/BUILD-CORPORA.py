@@ -91,16 +91,17 @@ def adjustTxt(lang, txt):
     """ minor text adjustments, specialized to each corpus,
          since we're interested in pronunciations...
     """
+    SET = False
     if lang == 'cmn':
         # replace punctuation with space:
         for ch in ['一', '。', '？', '：', '，', '；', '》', '《',
                    '\)', '\(', '）', '（', '〔', '〕', '！', '$',
-                   '\+', '=', '$'
+                   '\+', '=', '$', '…', '〈', '〉', '“', '\xad', '£', '…',
                    ]:
             txt = re.sub(ch, ' ', txt)
-            # and delete all digits:
-            txt = re.sub(r'\d', '', txt)
-            return txt.strip()
+        # and delete all digits:
+        txt = re.sub(r'\d', '', txt)
+        return txt.strip()
 
     elif lang == 'eng' or lang == 'emma':
         txt = re.sub(" ' s ", "'s ", txt)   # keep possessive 's attached, for emma
@@ -126,7 +127,8 @@ def adjustTxt(lang, txt):
         txt = re.sub('%', ' percent', txt)
         # delete punctuation:
         for ch in ['`', ';', ':', ',', '!', '\?', '\(', '\)', '"', "\.", '_', '=', '|',
-                   "‘", "’", '”', "\#", '&', '/', '\*', '\+', '$M', '$K', '$', '<', '>', ']'
+                   "‘", "’", '“', '”', "\#", '&', '/', '\*', '\+', '$M', '$K', '$', '<', '>', ']',
+                   '{', '}', '–',  '—', '…', '\xad', 
                    ]:
             txt = re.sub(ch, '', txt)
         # also delete all digits:
@@ -146,7 +148,8 @@ def adjustTxt(lang, txt):
         txt = re.sub('%', ' percent', txt)
         # delete punctuation:
         for ch in ['`', ';', ':', ',', '!', '\?', '\(', '\)', '"', "\.", '_', '=', '|',
-                   "‘", "’", '”', "\#", '&', '/', '\*', '\+', '$', '<', '>', ']', '@', '€'
+                   "‘", "’", '”', "\#", '&', '/', '\*', '\+', '$', '<', '>', ']', '@', '€',
+                   '«', '»', '\{', '}', '▶', '£', 
                    ]:
             txt = re.sub(ch, '', txt)
         # also delete all digits:
@@ -159,7 +162,8 @@ def adjustTxt(lang, txt):
 
     elif lang == 'hin':
         # delete punctuation:
-        for ch in ['"', '-', ',', '\.', '…', '\?', '!', ':', '।', '\(', '\)', '<', '>', '/'
+        for ch in ['"', '-', ',', '\.', '…', '\?', '!', ':', '।',
+                   '\(', '\)', '<', '>', '/',
                    ]:
             txt = re.sub(ch, '', txt)
         # and delete all digits:
@@ -172,7 +176,8 @@ def adjustTxt(lang, txt):
                    ':', '•', '`', '_', '>', '<', '≥', '»', '«', '˝',
                    '&','$', '\+', '@', '\[', '\]', '„',
                    '”', "'", "%", "\(", "\)", ';', '/',
-                   '̇ ', '–', '̈ ', '̈ ', '°', '_', '\*', 'μ', '○'
+                   '̇ ', '–', '̈ ', '̈ ', '°', '_', '\*', 'μ', '○',
+                   '’', '“', 
                    ]: 
             txt = re.sub(ch, '', txt)
         # and delete all digits:
@@ -181,7 +186,10 @@ def adjustTxt(lang, txt):
 
     elif lang == 'rus':
         # delete punctuation:
-        for ch in ['"', '-', ',', '\.', '…', '\?', '!', ':'
+        for ch in ['"', '-', ',', '\.', '…', '\?', '!',
+                   ':', '№', '£', '&', '\)', '\(', '\xa0',
+                   '%', '=', '@', '\*', '΄', '€', '\+', ';',
+                   '/', '$', '~', '<', '>',
                    ]:
             txt = re.sub(ch, '', txt)
         # and delete all digits:
@@ -195,8 +203,9 @@ def adjustTxt(lang, txt):
             txt = re.sub(x, ' '.join(x), txt)
         txt = re.sub('%', ' percent', txt)
         # delete punctuation:
-        for ch in ['`', ';', ':', ',', '!', '\?', '\(', '\)', '"', "\.", '_', '=', '|',
-                   "‘", "’", '”', "\#", '&', '/', '\*', '\+', '$', '<', '>', ']', '@', '€'
+        for ch in ['`', ';', ':', ',', '!', '¡', '\?', '¿', '\(', '\)', '"', "\.", '_', '=', '|',
+                   "‘", "’", '”', "\#", '&', '/', '\*', '\+', '$', '<', '>', ']', '@', '€',
+                   '〈', '〉', '‧', '…', 'ª'
                    ]:
             txt = re.sub(ch, '', txt)
         # also delete all digits:
@@ -288,8 +297,8 @@ def buildCorpus(langs):
                         cCnt += len(st)
                         sys.stdout.write('\r%d characters processed' % cCnt)
                         sys.stdout.flush()
-        
-                    txt = adjustTxt(lang,st)
+
+                    txt = adjustTxt(lang, st)
                     if VERBOSE: print('txt =',txt)
                     ws.write(txt)
                     ws.write('\n')
