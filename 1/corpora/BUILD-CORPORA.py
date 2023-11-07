@@ -23,9 +23,8 @@ Alternatively:
 
 builds corpora for all 8 languages.
 
-( These languages chosen because also covered fairly well by epitran. 
-  It is easy to extend this script to use additional corpora.
-)
+These languages chosen because also covered fairly well by epitran. 
+It is easy to extend this script to use additional corpora.
 
 On laptops and other small computers, building these corpora takes some time,
   esp. for the larger ones like eng and cmn ... time for a coffee break.
@@ -75,9 +74,9 @@ def ep(lang):
 
 def udName(lang, cor):
     """ create simple language-corpus prefix for names of created files """
-    if cor == 'emma':
+    if cor == 'emma':                   # nltk corpus
         return 'eng-emma'
-    else:
+    else:                               # UD corpus
         pathParts = cor.split('/')
         udf = pathParts[-1].split('-')
         udfParts = udf[0].split('_')
@@ -275,6 +274,7 @@ def buildCorpus(langs):
             cCnt = 0
     
             for st in corpus:
+                # ignore non-content lines
                 if not('[' in st) and \
                    not('http' in st) and \
                    not('VOLUME' in st) and \
@@ -312,6 +312,7 @@ def buildCorpus(langs):
                         else:
                             psa.write('_ ')
                     psa.write('\n')
+
             sys.stdout.write('\n%s transcription complete\n' % lang)
 
 if __name__ == '__main__':
