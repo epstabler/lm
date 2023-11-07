@@ -51,7 +51,7 @@ diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' 
 #   so we treat them as distinct symbols
 tones = ['「', '」', '『', '』']
 
-# these are output by epitran, but should not count as phonemes
+# these are output by epitran, but we don't them count as phonemes
 junk = ['~', '・', '─', ',', '.', 
         '曧', '袥', '/', '卧', '坮', '撘', '彝', '鱂', '痹', '\u200b', '$',
         '脱', '鍝', '洒', '櫾',
