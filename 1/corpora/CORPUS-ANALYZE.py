@@ -37,14 +37,14 @@ def syllabic(c):
                  'e','ẽ','è','ë','ễ','з','é', 'ɛ', 'ε', 'е', 'ё', '³',
                  'i','ĩ','î','ï','ĭ','ɪ','ı','ī','í','ɨ',
                  'o','õ','़','ॅ','ɔ','ò','ô','ö','œ','ø', 
-                 'u','û','ù','ü','ū','ʊ','ʌ','ш', 'ũ', 
+                 'u','û','ù','ü','ū','ʊ','ʌ','ш', 'ũ', 'ʉ',
                  'ɤ', 'ə'
                  ]
 
 # diacritics
 diacritics = ['ː', "'", ' ̩', ' ̤', 'ʰ', ' ̃', ' ̥', ' ̩', ' ̃', '_', ' ̤', ' ̯', '、', '̄',
               '‧', '°', ':', '·', '-', '`', '°', '‧', '^', '|', 'т', '̨', '̧', '̆', '̃', '̥',
-              '̤', 'ʲ', '̇', '̀',
+              '̤', 'ʲ', '̇', '̀', '̯', 
               ]
 
 # some diacritics mark tones too, but these are sometimes not next to vowel,
@@ -94,26 +94,25 @@ def analyze(lang):
     syll,nonsyll = (0,0)
     syllInThisFile = set([])
     nonsyllInThisFile = set([])
-    junkInThisFile = set([])
+    junkInThisFile = set([]) # mainly for debugging
     for c in langipa:
         if c in junk:
             junkInThisFile.add(c)
 
-        if syllabic(c):
+        elif syllabic(c):
             syllInThisFile.add(c)
             syll += 1
 
         elif not(c in [' ','\n','\t']) and \
              not(c in diacritics) and \
-             not(c in tones) and \
-             not(c in junk):
+             not(c in tones):
             nonsyllInThisFile.add(c)
             nonsyll += 1
 
     for o in [w,sys.stdout]:
         o.write('ipa syll = %s\n' % str(syllInThisFile))
         o.write('ipa non-syll = %s\n' % str(nonsyllInThisFile))
-        o.write('junk = %s\n' % str(junkInThisFile))
+        o.write('junk = %s\n' % str(junkInThisFile)) # mainly for debugging
         o.write('occurrences: %d syll, %d non-syll, so %.2f%% syll\n' % (syll, nonsyll, (100.*(syll/(syll+nonsyll)))))
 
     ipaBigrams = {}

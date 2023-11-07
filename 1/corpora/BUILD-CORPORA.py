@@ -218,7 +218,8 @@ def adjustTxt(lang, txt):
 
     elif lang == 'tha':
         # delete punctuation:
-        for ch in ['"', '-', ',', '\.', '…', '\?', '!', ':', '।', '\(', '\)', '<', '>', '/', '“'
+        for ch in ['"', '-', ',', '\.', '…', '\?', '!', ':', '।', '%',
+                   '\(', '\)', '<', '>', '/', '“', '”', '‘', '’', '—'
                    ]:
             txt = re.sub(ch, '', txt)
         # and delete all digits:
